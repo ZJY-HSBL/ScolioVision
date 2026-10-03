@@ -1,82 +1,104 @@
-// 工具函数
+import config from './config.js';
+
+const STORAGE_KEY = 'spinalAnalysisResults';
+
 const utils = {
-  // 显示提示消息
-  showToast: function(message, duration = 2000) {
+  showToast(message, duration = 2200) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
     toast.classList.add('show');
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       toast.classList.remove('show');
     }, duration);
   },
 
-  // 压缩图片
-  compressImage: function(file, maxWidth = 800, quality = 0.8) {
+  compressImage(file, maxWidth = 960, quality = 0.82) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = function(event) {
+
+      reader.onload = event => {
         const img = new Image();
-        img.onload = function() {
+
+        img.onload = () => {
           try {
-            // 计算压缩后的尺寸
             let width = img.width;
             let height = img.height;
 
+            if (!width || !height) {
+              throw new Error('无法读取图像尺寸');
+            }
+
             if (width > maxWidth) {
-              height = (height * maxWidth) / width;
+              height = Math.round((height * maxWidth) / width);
               width = maxWidth;
             }
 
-            // 创建canvas并绘制图片
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
-            const ctx = canvas.getContext('2d');
 
-            // 处理透明背景（针对PNG）
-            if (file.type === 'image/png') {
-              canvas.width = width;
-              canvas.height = height;
-              ctx.clearRect(0, 0, width, height);
+            const context = canvas.getContext('2d', {
+              alpha: file.type === 'image/png'
+            });
+
+            if (!context) {
+              throw new Error('浏览器不支持 Canvas 图像处理');
             }
 
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // 根据文件类型设置输出格式
-            const mimeType = file.type || 'image/jpeg';
-            const dataUrl = canvas.toDataURL(mimeType, quality);
-            resolve(dataUrl);
+            context.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL(file.type || 'image/jpeg', quality));
           } catch (error) {
-            reject(new Error('图片压缩失败'));
+            reject(error);
           }
         };
+
         img.onerror = () => reject(new Error('图片加载失败'));
         img.src = event.target.result;
       };
+
       reader.onerror = () => reject(new Error('文件读取失败'));
       reader.readAsDataURL(file);
     });
   },
 
-  // 存储分析结果到本地
-  saveAnalysisResult: function(result) {
-    const results = JSON.parse(localStorage.getItem('spinalAnalysisResults') || '[]');
-    results.unshift({
+  saveAnalysisResult(result) {
+    const results = this.getSavedResults();
+    const record = {
       id: Date.now(),
-      date: new Date().toLocaleString(),
+      date: new Date().toLocaleString('zh-CN', { hour12: false }),
       type: result.type,
+      cobbAngle: result.cobbAngle,
+      band: result.band,
       description: result.description,
       image: result.image,
+      source: result.source,
+      fingerprint: result.fingerprint,
       timestamp: Date.now()
-    });
-    localStorage.setItem('spinalAnalysisResults', JSON.stringify(results));
-    return results;
+    };
+
+    const next = [record, ...results].slice(0, config.maxStoredResults);
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch (error) {
+      const compact = next.map((item, index) => ({
+        ...item,
+        image: index === 0 ? item.image : ''
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(compact));
+    }
+
+    return next;
   },
 
-  // 获取本地存储的分析结果
-  getSavedResults: function() {
-    return JSON.parse(localStorage.getItem('spinalAnalysisResults') || '[]');
+  getSavedResults() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 };
 

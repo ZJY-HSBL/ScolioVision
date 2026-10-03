@@ -1,17 +1,24 @@
 {
-  "name": " ",
-  "version": "0.0.1",
-  "description": "",
+  "name": "scoliovision-research-prototype",
+  "version": "0.2.0",
+  "description": "Research-oriented scoliosis imaging workflow prototype with deterministic demo inference and a pluggable model adapter.",
   "private": true,
   "keywords": [
-    ""
+    "scoliosis",
+    "medical-imaging",
+    "cobb-angle",
+    "research-prototype",
+    "webpack"
   ],
-  "license": "",
-  "author": "",
+  "license": "UNLICENSED",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --open --config webpack.config.dev.js",
-    "build": "webpack --config webpack.config.prod.js"
+    "dev": "webpack serve --config webpack.config.dev.js",
+    "start": "npm run dev",
+    "build": "webpack --config webpack.config.prod.js",
+    "check": "node scripts/check-project.cjs"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^11.0.0",
