@@ -52,7 +52,7 @@ Structured Analysis Result
 
 ```bash
 git clone https://github.com/ZJY-HSBL/Scoliosis.git
-cd Scoliosis/Scoliosis/src
+cd Scoliosis/web
 npm install
 npm run dev
 ```
@@ -71,7 +71,7 @@ npm run check
 
 ### Model Integration
 
-Inference configuration is located in `Scoliosis/src/js/config.js`.
+Inference configuration is located in `web/js/config.js`.
 
 ```js
 analysisMode: 'remote',
@@ -138,7 +138,7 @@ ScolioVision provides a software platform for scoliosis-imaging research, algori
 
 ```bash
 git clone https://github.com/ZJY-HSBL/Scoliosis.git
-cd Scoliosis/Scoliosis/src
+cd Scoliosis/web
 npm install
 npm run dev
 ```
@@ -157,7 +157,7 @@ npm run check
 
 ### 模型接入
 
-推理配置位于 `Scoliosis/src/js/config.js`：
+推理配置位于 `web/js/config.js`：
 
 ```js
 analysisMode: 'remote',
