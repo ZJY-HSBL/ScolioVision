@@ -51,8 +51,8 @@ Structured Analysis Result
 ### Quick Start
 
 ```bash
-git clone https://github.com/ZJY-HSBL/Scoliosis.git
-cd Scoliosis/web
+git clone https://github.com/ZJY-HSBL/ScolioVision.git
+cd ScolioVision/web
 npm install
 npm run dev
 ```
@@ -137,8 +137,8 @@ ScolioVision provides a software platform for scoliosis-imaging research, algori
 ### 快速运行
 
 ```bash
-git clone https://github.com/ZJY-HSBL/Scoliosis.git
-cd Scoliosis/web
+git clone https://github.com/ZJY-HSBL/ScolioVision.git
+cd ScolioVision/web
 npm install
 npm run dev
 ```
