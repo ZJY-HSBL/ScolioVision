@@ -4,7 +4,7 @@ title: "ScolioVision: Scoliosis Imaging Research Prototype"
 type: software
 authors:
   - name: "ZJY-HSBL"
-repository-code: "https://github.com/ZJY-HSBL/Scoliosis"
-url: "https://github.com/ZJY-HSBL/Scoliosis"
+repository-code: "https://github.com/ZJY-HSBL/ScolioVision"
+url: "https://github.com/ZJY-HSBL/ScolioVision"
 version: "0.2.0"
 date-released: "2026-10-03"
