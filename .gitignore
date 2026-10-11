@@ -1,0 +1,16 @@
+# Node / frontend
+web/node_modules/
+web/dist/
+web/.cache/
+web/*.log
+
+# Local environment
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
