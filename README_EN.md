@@ -28,8 +28,8 @@ Image Input → Local Validation & Preprocessing → Inference Service → Struc
 ## Run
 
 ```bash
-cd Scoliosis/src
-npm install
+cd ScolioVision/web
+npm ci
 npm run dev
 ```
 
@@ -39,3 +39,12 @@ Project check: `npm run check`
 ## Research Directions
 
 The platform can be extended for vertebral landmark localization, endplate detection, end-vertebra selection, automatic Cobb-angle estimation, curve-pattern classification, image-quality control, external validation, and longitudinal follow-up analysis.
+
+
+## v0.3.0 workstation
+
+The default mode is now **manual endplate-based Cobb geometry**: place four image-space endpoints across superior and inferior endplates and compute the acute line-to-line angle. The image-first viewer supports undo/reset, contrast adjustment, zoom, annotation PNG and JSON export. History stores metadata only and offers record deletion. The synthetic inference demo is clearly marked and is not a medical assessment.
+
+Run `npm test` for geometry unit tests. On version increments merged into `main`, the GitHub Actions release workflow builds, tests and publishes a versioned static site ZIP in [Releases](https://github.com/ZJY-HSBL/ScolioVision/releases). This package is not a native desktop installer.
+
+This is a research and teaching tool, not a medical device. End-vertebra selection and clinical interpretation require qualified oversight.
