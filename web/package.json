@@ -1,7 +1,7 @@
 {
   "name": "scoliovision-research-prototype",
-  "version": "0.2.0",
-  "description": "Research-oriented scoliosis imaging workflow prototype with deterministic demo inference and a pluggable model adapter.",
+  "version": "0.3.0",
+  "description": "Image-first spinal radiograph research workstation with manual four-point Cobb angle measurement, optional demo and remote adapter.",
   "private": true,
   "keywords": [
     "scoliosis",
@@ -15,7 +15,8 @@
     "dev": "webpack serve --config webpack.config.dev.js",
     "start": "npm run dev",
     "build": "webpack --config webpack.config.prod.js",
-    "check": "node scripts/check-project.cjs"
+    "check": "node scripts/check-project.cjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "engines": {
     "node": ">=18"

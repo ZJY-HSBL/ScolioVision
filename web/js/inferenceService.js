@@ -102,8 +102,8 @@ async function requestRemoteInference({ imageData, fileName }) {
   }
 }
 
-export async function runInference(input) {
-  if (config.analysisMode === 'remote') {
+export async function runInference(input, mode = config.analysisMode) {
+  if (mode === 'remote') {
     return requestRemoteInference(input);
   }
 
