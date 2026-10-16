@@ -127,7 +127,7 @@ const analyzer = {
     this.spinalType.textContent = result.type;
     this.spinalDescription.textContent = result.description;
     const manual = result.source === 'manual-four-point';
-    this.resultMode.textContent = manual ? 'MANUAL · VERIFIED GEOMETRY' : result.source === 'reproducible-workflow' ? 'SIMULATED · DEMO' : 'REMOTE · UNVERIFIED';
+    this.resultMode.textContent = manual ? 'MANUAL · GEOMETRY' : result.source === 'reproducible-workflow' ? 'SIMULATED · DEMO' : 'REMOTE · UNVERIFIED';
     this.resultBand.textContent = result.band;
     this.cobbAngle.textContent = Number(result.cobbAngle).toFixed(1) + '°';
     document.getElementById('export-image').disabled = !manual;
