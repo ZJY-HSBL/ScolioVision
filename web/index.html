@@ -2,145 +2,84 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="ScolioVision：面向脊柱侧弯影像评估工作流的科研交互原型。">
-  <meta name="theme-color" content="#312e81">
-  <title>曲度智衡 · ScolioVision Research Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ScolioVision 脊柱影像研究工作台：手动 Cobb 角测量、影像标注、记录导出及科研模型接口。">
+  <meta name="theme-color" content="#17252a">
+  <title>ScolioVision · 脊柱影像研究工作台</title>
   <link rel="manifest" href="site.webmanifest">
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div class="toast" id="toast"></div>
-
-<header class="main-title">
-  <div class="brand-title">曲度智衡 · ScolioVision</div>
-  <div class="brand-subtitle">Research Prototype for Scoliosis Imaging Workflow</div>
-</header>
-
-<main>
-  <section class="app-page active" id="home-page">
-    <h1 class="page-title">研究工作台</h1>
-
-    <div class="user-info">
-      <div class="avatar">
-        <img src="./img/userimage.jpg" alt="用户头像">
-      </div>
-      <div class="user-copy">
-        <p class="user-name">脊柱影像研究工作区</p>
-        <p class="user-meta" id="last-assessment">上次评估：暂无记录</p>
-      </div>
-      <span class="status-badge">PROTOTYPE</span>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="app-shell">
+  <nav class="app-nav" aria-label="主要导航">
+    <div class="nav-brand">
+      <div class="brand-logo" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <div><strong>ScolioVision</strong><small>SPINAL IMAGING LAB</small></div>
     </div>
-
-    <section class="research-card" aria-label="research prototype notice">
-      <div class="research-kicker">RESEARCH PROTOTYPE / 科研原型</div>
-      <p>系统采用可复现的影像分析工作流，用于科研交互、接口联调与模型服务集成。</p>
-    </section>
-
-    <div class="insight-grid">
-      <article class="insight-card">
-        <span class="insight-label">Inference</span>
-        <strong>Reproducible Workflow</strong>
-        <p>稳定的数据流程便于科研测试与系统验证。</p>
-      </article>
-      <article class="insight-card">
-        <span class="insight-label">Integration</span>
-        <strong>Model-Agnostic</strong>
-        <p>可切换为远程 PyTorch / ONNX 模型服务。</p>
-      </article>
-    </div>
-
-    <section class="my-analysis">
-      <div class="module-title">
-        <span>分析历史 · Analysis History</span>
-        <span class="module-caption">Local only</span>
-      </div>
-
-      <div class="empty-tip">
-        <div class="empty-graphic">XR</div>
-        <p>暂无分析记录</p>
-        <p class="empty-subtitle">进入评估页面上传影像，完成一次科研流程演示。</p>
-      </div>
-
-      <div class="analysis-list" style="display: none;"></div>
-    </section>
-  </section>
-
-  <section class="app-page" id="analyze-page">
-    <h1 class="page-title">脊柱侧弯影像评估</h1>
-    <div class="analysis-pipeline">Local preprocessing → Inference adapter → Structured result → Local history</div>
-
-    <div class="upload-area" id="upload-area">
-      <label for="file-input">
-        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-        </svg>
-        <p class="upload-text">上传脊柱影像 · Upload Radiograph</p>
-        <p class="upload-tip">JPG / PNG / WEBP · 最大 5 MB · 浏览器本地预处理</p>
-      </label>
-      <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp">
-    </div>
-
-    <div class="preview-area" id="preview-area">
-      <button class="preview-remove" id="preview-remove" type="button" aria-label="移除预览">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
-      </button>
-      <div class="preview-heading">
-        <span>Input Preview</span>
-        <span>LOCAL</span>
-      </div>
-      <img id="preview-img" alt="上传影像预览">
-    </div>
-
-    <div class="loading" id="loading">正在执行影像分析流程...</div>
-    <div class="error" id="error"></div>
-
-    <button class="btn btn-primary" id="analyze-btn" disabled>开始分析 · Run Analysis</button>
-
-    <section class="result-area" id="result-area">
-      <div class="result-header">
-        <div>
-          <p class="result-eyebrow">STRUCTURED OUTPUT</p>
-          <h2 class="result-title">分析结果</h2>
+    <p class="nav-section-label">WORKSPACE</p>
+    <button class="nav-item active" data-target="home-page" type="button"><span class="nav-glyph" aria-hidden="true">⌂</span><span>项目概览</span></button>
+    <button class="nav-item" data-target="analyze-page" type="button"><span class="nav-glyph" aria-hidden="true">⌗</span><span>影像测量</span></button>
+    <div class="nav-footer"><span class="nav-status-dot"></span> RESEARCH ONLY <small>v0.3.0 · Local first</small></div>
+  </nav>
+  <div class="app-main">
+    <header class="main-title">
+      <div><span class="header-kicker">IMAGING RESEARCH / SCIENTIFIC WORKFLOW</span><div class="brand-title">曲度智衡 <span>·</span> ScolioVision</div></div>
+      <span class="header-label">本地工作区 <b>●</b></span>
+    </header>
+    <main>
+      <section class="app-page active" id="home-page">
+        <div class="home-hero">
+          <div><div class="section-index">01 / OVERVIEW</div><h1>从一张影像，<br>到一次可复核的测量。</h1><p>选择上下端椎终板，标注四个端点，复核 Cobb 角。每一步都有依据，不让模拟结果冒充临床结论。</p>
+            <button class="hero-start" type="button" id="go-to-measurement">打开影像工作台 <span aria-hidden="true">↗</span></button></div>
+          <div class="hero-diagram" aria-hidden="true"><div class="diagram-tag">01 · LANDMARKS</div><svg viewBox="0 0 300 330"><path d="M143 35 C112 82 181 109 155 164 S117 237 153 293" stroke="#a3d5ce" stroke-width="22" fill="none" opacity=".15" stroke-linecap="round"/><path d="M143 35 C112 82 181 109 155 164 S117 237 153 293" stroke="#9fc9be" stroke-width="2" fill="none" stroke-dasharray="5 8"/><g fill="none" stroke="#c6d5d1" stroke-width="8" stroke-linecap="round"><path d="M124 61l42 10"/><path d="M126 94l42-11"/><path d="M139 124l43 5"/><path d="M129 159l44 10"/><path d="M112 195l43-2"/><path d="M125 232l43-12"/><path d="M131 265l43 9"/></g><path d="M98 60L198 87" stroke="#f1b46d" stroke-width="3"/><path d="M92 268L196 284" stroke="#67d5bd" stroke-width="3"/><g fill="#f1b46d"><circle cx="98" cy="60" r="5"/><circle cx="198" cy="87" r="5"/></g><g fill="#67d5bd"><circle cx="92" cy="268" r="5"/><circle cx="196" cy="284" r="5"/></g></svg><div class="diagram-bottom">02 · GEOMETRY & REVIEW</div></div>
         </div>
-        <div class="result-meta">
-          <span class="result-chip" id="result-mode">DEMO</span>
-          <span class="result-chip result-chip-muted" id="result-band">等待分析</span>
-        </div>
-      </div>
-
-      <div class="metric-card">
-        <span>
-          <small>Cobb Angle</small>
-          <b>演示角度字段</b>
-        </span>
-        <strong id="cobb-angle">--</strong>
-      </div>
-
-      <div class="spinal-type" id="spinal-type">分析中...</div>
-      <div class="spinal-description" id="spinal-description"></div>
-
-      <section class="training-plan" id="training-plan">
-        <div class="section-heading">
-          <h3>动作交互库 · Exercise Library</h3>
-          <span>非个体化处方</span>
-        </div>
-        <div id="training-plan-content"></div>
+        <div class="overview-strip"><div><small>01 / SELECT</small><strong>导入影像</strong><span>JPG · PNG · WEBP</span></div><div><small>02 / MARK</small><strong>四点终板标注</strong><span>手动选择，随时撤回</span></div><div><small>03 / EXPORT</small><strong>结果与标注导出</strong><span>JSON · 标注影像</span></div></div>
+        <section class="my-analysis"><div class="module-title"><span>最近测量记录</span><span class="module-caption" id="last-assessment">上次评估：暂无记录</span></div><p class="history-notice">记录元数据仅存于当前浏览器，不会默认存储上传的医学影像。请勿以此作为病历管理系统。</p><div class="empty-tip"><div class="empty-graphic">XR</div><p>尚无测量记录</p><p class="empty-subtitle">从影像工作台开始一次手动测量。</p></div><div class="analysis-list" style="display:none"></div></section>
       </section>
 
-      <div class="result-disclaimer">
-        <strong>Research note.</strong>
-        正式医学研究应结合经过验证的数据集与模型，并执行独立测试、误差分析和外部验证。
-      </div>
+      <section class="app-page" id="analyze-page">
+        <div class="workspace-heading"><div><div class="section-index">02 / MEASUREMENT STUDIO</div><h1 class="page-title">影像测量工作台</h1><p>请使用适宜的脊柱正位影像，并由具备相关知识的人员选择上、下端椎终板。</p></div><div class="page-version">COBB / 4-POINT METHOD</div></div>
+        <div class="workspace-grid">
+          <section class="workspace-canvas" aria-label="影像标注画布">
+            <div class="canvas-topbar"><div><span class="live-dot"></span> IMAGE VIEWER <small id="image-filename">未载入影像</small></div><span class="canvas-mark">LOCAL PREVIEW</span></div>
+            <div class="canvas-tools">
+              <button type="button" class="tool-btn" id="zoom-out" title="缩小">−</button><span id="zoom-label">100%</span><button type="button" class="tool-btn" id="zoom-in" title="放大">+</button><span class="tool-separator"></span>
+              <button type="button" class="tool-btn tool-text" id="contrast-toggle">增强对比度</button><button type="button" class="tool-btn tool-text" id="reset-view">重置视图</button>
+            </div>
+            <div class="image-viewport" id="image-viewport">
+              <div class="upload-area" id="upload-area"><label for="file-input"><div class="upload-symbol" aria-hidden="true">＋</div><strong>拖入脊柱影像，或点击选择文件</strong><span>支持 JPG、PNG、WEBP · 不超过 5 MB</span><small>仅在当前浏览器处理 · 远程模式除外</small></label><input id="file-input" type="file" accept="image/jpeg,image/png,image/webp"></div>
+              <div class="preview-area" id="preview-area"><div class="image-stage" id="image-stage"><img id="preview-img" alt="待标注脊柱影像"><svg xmlns="http://www.w3.org/2000/svg" id="measurement-overlay" aria-label="手动终板标注层" role="img"></svg></div></div>
+            </div>
+            <div class="canvas-footer"><span>研究测量工具 · 非医疗器械</span><button type="button" class="change-image" id="preview-remove">更换影像 ↗</button></div>
+          </section>
 
-      <button class="btn btn-secondary" id="save-result-btn">保存到本地历史 · Save Locally</button>
-    </section>
-  </section>
-
+          <aside class="workspace-panel" aria-label="测量操作面板">
+            <div class="panel-kicker">MEASUREMENT CONTROLS</div><h2>测量与分析</h2>
+            <label class="control-label" for="analysis-mode">工作模式</label>
+            <select id="analysis-mode" class="mode-select"><option value="manual">手动 Cobb 角测量（默认）</option><option value="demo">演示推理 · 非真实测量</option><option value="remote">远程模型接口</option></select>
+            <div id="manual-controls" class="manual-controls">
+              <div class="instruction-heading"><span>依次标注四个端点</span><small id="point-count">0 / 4</small></div>
+              <div class="point-progress" id="point-progress"><span></span><span></span><span></span><span></span></div>
+              <p class="point-instruction" id="point-instruction">① 点击上端椎上终板的左端点</p>
+              <div class="point-actions"><button type="button" id="undo-point">撤回上一点</button><button type="button" id="clear-points">清空标注</button></div>
+              <div class="instant-angle"><small>实时几何计算</small><strong id="live-cobb-angle">—</strong><span>仅反映所选两条终板的夹角</span></div>
+            </div>
+            <div id="loading" class="loading" role="status">正在分析影像…</div><div id="error" class="error" role="alert"></div>
+            <button type="button" class="btn btn-primary" id="analyze-btn" disabled>生成测量结果 <span aria-hidden="true">→</span></button>
+            <section class="result-area" id="result-area">
+              <div class="result-header"><div><p class="result-eyebrow">REVIEW & EXPORT</p><h2 class="result-title">测量结果</h2></div><div class="result-meta"><span class="result-chip" id="result-mode">MANUAL</span><span class="result-chip result-chip-muted" id="result-band">待标注</span></div></div>
+              <div class="metric-card"><span><small>COBB ANGLE</small><b>终板夹角</b></span><strong id="cobb-angle">—</strong></div>
+              <div id="spinal-type" class="spinal-type"></div><div id="spinal-description" class="spinal-description"></div>
+              <div class="result-export"><button type="button" id="export-json" class="btn btn-secondary">导出 JSON</button><button type="button" id="export-image" class="btn btn-secondary">导出标注 PNG</button></div>
+              <button type="button" class="btn btn-secondary" id="save-result-btn">保存测量记录（不含影像）</button>
+              <details class="exercise-disclosure"><summary>打开辅助动作资料库（非处方）</summary><section class="training-plan" id="training-plan"><div class="section-heading"><h3>动作演示</h3><span>研究交互参考</span></div><div id="training-plan-content"></div></section></details>
+            </section>
+            <p class="panel-disclaimer">本工具仅用于科研和教学。手动标注结果依赖终板选择准确性，不提供临床诊断、治疗建议或自动椎体识别。</p>
+          </aside>
+        </div>
+      </section>
   <section class="app-page" id="training-detail-page">
     <button class="back-btn" id="back-to-plan" type="button">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -184,22 +123,9 @@
       <button class="btn btn-primary" id="start-training-btn">启动动作计时 · Demo Timer</button>
     </div>
   </section>
-</main>
 
-<nav class="app-nav" aria-label="主要导航">
-  <button class="nav-item active" data-target="home-page" type="button">
-    <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-      <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 1 0v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L8.354 1.146z"/>
-    </svg>
-    <span>工作台</span>
-  </button>
-  <button class="nav-item" data-target="analyze-page" type="button">
-    <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm0-1a7 7 0 1 1 0-14 7 7 0 0 1 0 14z"/>
-      <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
-    </svg>
-    <span>影像评估</span>
-  </button>
-</nav>
+    </main>
+  </div>
+</div>
 </body>
 </html>
