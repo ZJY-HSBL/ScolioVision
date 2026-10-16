@@ -52,6 +52,7 @@ const imageUpload = {
     this.previewRemove.addEventListener('click', event => {
       event.stopPropagation();
       this.clearPreview();
+      this.fileInput.click();
     });
   },
 
