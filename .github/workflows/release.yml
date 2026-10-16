@@ -1,0 +1,66 @@
+name: Publish release
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: scoliovision-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Determine version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./web/package.json').version")
+          TAG="v${VERSION}"
+          if [[ "${GITHUB_REF}" == refs/tags/* && "${GITHUB_REF_NAME}" != "${TAG}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version ${TAG}" >&2
+            exit 1
+          fi
+          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "publish=false" >> "${GITHUB_OUTPUT}"
+          else
+            echo "publish=true" >> "${GITHUB_OUTPUT}"
+          fi
+      - name: Install, test and build
+        if: steps.version.outputs.publish == 'true'
+        working-directory: web
+        run: |
+          npm ci
+          npm run check
+          npm test
+          npm run build
+      - name: Package static application
+        if: steps.version.outputs.publish == 'true'
+        working-directory: web
+        shell: bash
+        run: |
+          cd dist
+          zip -qr "../../ScolioVision-web-${{ steps.version.outputs.tag }}.zip" .
+      - name: Create GitHub release with web build
+        if: steps.version.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          gh release create "$TAG" "ScolioVision-web-$TAG.zip" \
+            --target "$GITHUB_SHA" \
+            --title "ScolioVision $TAG" \
+            --generate-notes \
+            --latest

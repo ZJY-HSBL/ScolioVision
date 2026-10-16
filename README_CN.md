@@ -28,8 +28,8 @@ ScolioVision（曲度智衡）是一套面向脊柱侧弯影像分析场景构�
 ## 运行方式
 
 ```bash
-cd Scoliosis/src
-npm install
+cd ScolioVision/web
+npm ci
 npm run dev
 ```
 
@@ -41,3 +41,17 @@ npm run dev
 项目可进一步扩展至椎体关键点定位、终板检测、上下端椎识别、Cobb 角自动测量、侧弯模式分类、影像质量控制、外部验证和纵向随访分析等研究方向。
 
 在 Cobb 角估计任务中，可采用 MAE、RMSE、误差阈值内比例、ICC 和 Bland–Altman 分析等指标；分类任务可使用 Precision、Recall、F1-score、混淆矩阵及概率校准指标。
+
+## v0.3.0 · 手动 Cobb 角工作台
+
+打开「影像测量」，导入 JPG/PNG/WEBP 后，按顺序在原图上点击**上端椎上终板左、右端点**与**下端椎下终板左、右端点**。几何模块使用两条终板向量的锐角夹角计算 Cobb 角；支持撤回、重置、放大、对比度增强、JSON 和标注 PNG 导出。
+
+默认模式现在是**人工标注**，不再默认展示由图像散列生成的模拟角度。演示推理模式仍可单独切换，并明确标注为模拟结果；远程模式只有在配置可信的后端地址并提供实际模型后才能工作。系统不自动确定端椎、侧弯类型或临床严重程度。
+
+浏览器历史默认只保存**结果元数据**，不会新存储原始医学影像。导出的 JSON 包含端点像素坐标、图像尺寸、方法与时间信息，可用于复核。请在处理患者数据前完成合法合规的脱敏和伦理审核。请勿将系统输出用于独立临床诊断。
+
+运行几何单元测试：`cd web && npm test`。
+
+## Releases 发布约定
+
+`web/package.json` 的版本是唯一版本源。每次需要发布时先递增版本，再合并至 `main`。GitHub Actions「Publish release」在 main 更新后执行检查、测试、生产构建，自动创建 `vX.Y.Z` GitHub Release 并附加 `ScolioVision-web-vX.Y.Z.zip`。已存在该版本 Release 时不重复创建。也支持在 Actions 页面手动触发发布。Release ZIP 是静态 Web 构建，不是 Windows 安装包，也不包含医疗诊断模型。

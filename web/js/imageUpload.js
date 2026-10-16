@@ -52,6 +52,7 @@ const imageUpload = {
     this.previewRemove.addEventListener('click', event => {
       event.stopPropagation();
       this.clearPreview();
+      this.fileInput.click();
     });
   },
 
@@ -75,7 +76,10 @@ const imageUpload = {
       this.fileName = file.name;
       this.imageBase64 = compressedDataUrl;
       this.previewImg.src = compressedDataUrl;
+      if (this.previewImg.decode) await this.previewImg.decode();
       this.previewArea.style.display = 'block';
+      this.uploadArea.style.display = 'none';
+      window.dispatchEvent(new Event('scoliovision:image-ready'));
       this.analyzeBtn.disabled = false;
 
       utils.showToast('图像已就绪');
@@ -88,7 +92,9 @@ const imageUpload = {
 
   clearPreview() {
     this.previewArea.style.display = 'none';
+    this.uploadArea.style.display = 'block';
     this.previewImg.src = '';
+    window.dispatchEvent(new Event('scoliovision:image-cleared'));
     this.analyzeBtn.disabled = true;
     this.imageBase64 = '';
     this.fileInput.value = '';

@@ -71,7 +71,7 @@ const utils = {
       cobbAngle: result.cobbAngle,
       band: result.band,
       description: result.description,
-      image: result.image,
+      image: '', // Image data is deliberately never stored by default.
       source: result.source,
       fingerprint: result.fingerprint,
       timestamp: Date.now()
@@ -89,6 +89,12 @@ const utils = {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(compact));
     }
 
+    return next;
+  },
+
+  removeResult(id) {
+    const next = this.getSavedResults().filter(item => item.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     return next;
   },
 

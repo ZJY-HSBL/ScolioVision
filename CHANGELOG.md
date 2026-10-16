@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.3.0 — 2026-10-17
+
+### Added
+- Image-first desktop and mobile measurement workstation.
+- Manual four-point endplate annotation with geometrically calculated Cobb angle.
+- Image viewer zoom, enhanced contrast, annotation undo/reset, and live angle preview.
+- Export of measurement JSON and annotated PNG images.
+- Local metadata-only history and per-record deletion.
+- Six geometry unit tests and CI build verification.
+- Automatic GitHub Releases containing tested static site ZIP artifacts.
+
+### Changed
+- Manual measurement is the default; deterministic image-hash inference is now explicitly labelled simulation mode.
+- Distinguished geometry derived from human-selected endpoints from remote model inference.
+- Refreshed documentation, version metadata and npm lockfile.
+
+### Limits
+- No automatic vertebra detection, model weights, diagnostic conclusion or Windows executable.
+- For research and teaching only.
+
+
 ## 0.2.0 — 2026-10-03
 
 ### Features

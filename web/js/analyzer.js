@@ -1,8 +1,10 @@
+import config from './config.js';
 import utils from './utils.js';
 import imageUpload from './imageUpload.js';
+import measurement from './measurement.js';
 import trainingDetail from './trainingDetail.js';
 import history from './history.js';
-import { runInference } from './inferenceService.js';
+import {runInference} from './inferenceService.js';
 
 const analyzer = {
   init() {
@@ -17,26 +19,40 @@ const analyzer = {
     this.resultMode = document.getElementById('result-mode');
     this.resultBand = document.getElementById('result-band');
     this.cobbAngle = document.getElementById('cobb-angle');
-
+    this.modeSelect = document.getElementById('analysis-mode');
+    this.currentTrainingPlan = [];
+    this.currentResult = null;
+    this.busy = false;
     this.analyzeBtn.addEventListener('click', () => this.startAnalysis());
     this.saveResultBtn.addEventListener('click', () => this.saveResult());
-
+    this.modeSelect.addEventListener('change', () => this.changeMode());
+    document.getElementById('export-json').addEventListener('click', () => this.exportJson());
+    document.getElementById('export-image').addEventListener('click', () => {
+      try { measurement.exportAnnotatedPng(); } catch (error) { utils.showToast(error.message || '标注导出失败'); }
+    });
     this.trainingPlanContent.addEventListener('click', event => {
       const planItem = event.target.closest('.training-plan-item');
-
-      if (!planItem) {
-        return;
-      }
-
+      if (!planItem) return;
       const index = Number(planItem.dataset.index);
-
       if (Number.isInteger(index) && this.currentTrainingPlan[index]) {
         trainingDetail.showDetail(this.currentTrainingPlan[index]);
       }
     });
-
-    this.currentTrainingPlan = [];
-    this.currentResult = null;
+    window.addEventListener('scoliovision:measurement-change', () => {
+      this.invalidateResult();
+      this.refreshAvailability();
+    });
+    window.addEventListener('scoliovision:image-ready', () => {
+      this.invalidateResult();
+      document.getElementById('image-filename').textContent = imageUpload.getFileName();
+      this.refreshAvailability();
+    });
+    window.addEventListener('scoliovision:image-cleared', () => {
+      this.invalidateResult();
+      document.getElementById('image-filename').textContent = '未载入影像';
+      this.refreshAvailability();
+    });
+    this.changeMode();
   },
 
   getTrainingPlanByType() {
@@ -85,82 +101,113 @@ const analyzer = {
     ];
   },
 
+
+  changeMode() {
+    const manual = this.modeSelect.value === 'manual';
+    document.getElementById('manual-controls').style.display = manual ? 'block' : 'none';
+    measurement.svg.style.pointerEvents = manual ? 'auto' : 'none';
+    const labels = { manual:'生成测量结果 →', demo:'运行模拟流程（非真实测量） →', remote:'调用远程模型 →' };
+    this.analyzeBtn.textContent = labels[this.modeSelect.value] || labels.manual;
+    this.invalidateResult();
+    this.refreshAvailability();
+  },
+
+  refreshAvailability() {
+    const manual = this.modeSelect.value === 'manual';
+    this.analyzeBtn.disabled = this.busy || !imageUpload.getImageData() || (manual && !measurement.getResult());
+  },
+
+  invalidateResult() {
+    this.currentResult = null;
+    this.resultArea.style.display = 'none';
+    this.error.style.display = 'none';
+  },
+
+  renderResult(result) {
+    this.spinalType.textContent = result.type;
+    this.spinalDescription.textContent = result.description;
+    const manual = result.source === 'manual-four-point';
+    this.resultMode.textContent = manual ? 'MANUAL · GEOMETRY' : result.source === 'reproducible-workflow' ? 'SIMULATED · DEMO' : 'REMOTE · UNVERIFIED';
+    this.resultBand.textContent = result.band;
+    this.cobbAngle.textContent = Number(result.cobbAngle).toFixed(1) + '°';
+    document.getElementById('export-image').disabled = !manual;
+    this.currentTrainingPlan = this.getTrainingPlanByType();
+    this.trainingPlanContent.replaceChildren();
+    this.currentTrainingPlan.forEach((plan, index) => {
+      const item = document.createElement('button');
+      item.type = 'button'; item.className = 'training-plan-item'; item.dataset.index = String(index);
+      const title = document.createElement('h4'); title.textContent = plan.name; item.append(title);
+      this.trainingPlanContent.append(item);
+    });
+    this.resultArea.style.display = 'block';
+  },
+
   async startAnalysis() {
+    if (this.busy) return;
+    const imageData = imageUpload.getImageData();
+    if (!imageData) { utils.showToast('请先上传影像'); return; }
+    this.busy = true; this.refreshAvailability();
+    this.error.style.display = 'none';
+    this.loading.style.display = 'block';
+    this.resultArea.style.display = 'none';
     try {
-      this.loading.style.display = 'block';
-      this.error.style.display = 'none';
-      this.resultArea.style.display = 'none';
-      this.analyzeBtn.disabled = true;
-
-      const imageData = imageUpload.getImageData();
-
-      if (!imageData) {
-        throw new Error('未找到图像数据，请重新上传');
+      let result;
+      if (this.modeSelect.value === 'manual') {
+        const landmarks = measurement.getResult();
+        if (!landmarks) throw new Error('请完成四点标注，两条终板的端点不能重合');
+        result = {
+          ...landmarks,
+          type:'终板手动测量',
+          band:'人工标注 · 未经临床复核',
+          description:'Cobb 角由人工选择的两条终板直线夹角计算。软件没有自动识别上、下端椎，也没有判断侧弯分型。请核对端椎选取与标注位置。',
+          source:'manual-four-point'
+        };
+      } else {
+        result = await runInference({
+          imageData,
+          fileName: imageUpload.getFileName()
+        }, this.modeSelect.value);
       }
-
-      const result = await runInference({
-        imageData,
-        fileName: imageUpload.getFileName()
-      });
-
-      this.currentTrainingPlan = this.getTrainingPlanByType(result.type);
-      this.currentResult = {
-        ...result,
-        image: imageData
-      };
-
-      this.spinalType.textContent = result.type;
-      this.spinalDescription.textContent = result.description;
-      this.resultMode.textContent = result.source === 'reproducible-workflow'
-        ? 'REPRODUCIBLE'
-        : 'REMOTE MODEL';
-      this.resultBand.textContent = result.band;
-      this.cobbAngle.textContent = `${Number(result.cobbAngle).toFixed(1)}°`;
-
-      this.trainingPlanContent.replaceChildren();
-
-      this.currentTrainingPlan.forEach((plan, index) => {
-        const item = document.createElement('button');
-        item.type = 'button';
-        item.className = 'training-plan-item';
-        item.dataset.index = String(index);
-
-        const title = document.createElement('h4');
-        title.textContent = plan.name;
-
-        item.appendChild(title);
-        this.trainingPlanContent.appendChild(item);
-      });
-
-      this.loading.style.display = 'none';
-      this.resultArea.style.display = 'block';
-      this.analyzeBtn.disabled = false;
-
-      utils.showToast('分析流程已完成');
+      this.currentResult = {...result};
+      this.renderResult(result);
+      utils.showToast(this.modeSelect.value === 'manual' ? '已生成几何测量结果' : '流程已完成，请核对来源标签');
     } catch (error) {
-      this.loading.style.display = 'none';
       this.error.textContent = error.message || '分析失败，请重试';
       this.error.style.display = 'block';
-      this.analyzeBtn.disabled = false;
       console.error('Analysis error:', error);
+    } finally {
+      this.busy = false;
+      this.loading.style.display = 'none';
+      this.refreshAvailability();
     }
   },
 
   saveResult() {
-    if (!this.currentResult) {
-      utils.showToast('没有可保存的分析结果');
-      return;
-    }
-
+    if (!this.currentResult) { utils.showToast('没有可保存的结果'); return; }
     try {
       utils.saveAnalysisResult(this.currentResult);
       history.render();
-      utils.showToast('结果已保存到本地浏览器');
-    } catch (error) {
-      utils.showToast('本地保存失败，请检查浏览器存储空间');
-      console.error('Save result error:', error);
+      utils.showToast('已保存测量元数据，未保存原始影像');
+    } catch(error) {
+      utils.showToast('本地存储失败，请检查空间或浏览器设置');
+      console.error(error);
     }
+  },
+
+  exportJson() {
+    if (!this.currentResult) { utils.showToast('请先完成一次测量'); return; }
+    const payload = {
+      schema:'scoliovision.measurement.v1',
+      appVersion:config.version,
+      exportedAt:new Date().toISOString(),
+      researchUseOnly:true,
+      ...this.currentResult
+    };
+    const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'scoliovision-measurement.json'; a.click();
+    window.setTimeout(() => URL.revokeObjectURL(url),1000);
   }
 };
-
 export default analyzer;

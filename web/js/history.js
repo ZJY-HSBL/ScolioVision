@@ -57,7 +57,14 @@ const history = {
       description.textContent = `${result.type || '未分类'}${angleText}`;
 
       content.append(title, description);
-      item.append(imageBox, content);
+      const remove = document.createElement('button');
+      remove.type = 'button'; remove.className = 'history-remove'; remove.textContent = '删除';
+      remove.setAttribute('aria-label', '删除此条测量记录');
+      remove.addEventListener('click', () => {
+        utils.removeResult(result.id);
+        this.render();
+      });
+      item.append(imageBox, content, remove);
       this.analysisList.appendChild(item);
     });
   }
