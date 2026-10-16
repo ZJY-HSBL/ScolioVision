@@ -7,6 +7,16 @@
 
 ---
 
+## Release v0.3.0 / 版本说明
+
+**Current default: real, manually placed four-point Cobb-angle geometry.** Select the superior and inferior endplate endpoints in the image viewer. Undo, zoom, local JSON/PNG exports, and metadata-only local history are supported. Synthetic demo values are isolated behind an explicitly labelled mode; they are **not medical measurements**. The interface is a research prototype, not a medical device.
+
+**当前默认：人工四点终板标注 + 几何 Cobb 角计算。** 可撤回标注、缩放影像、导出 JSON/PNG，并仅保存不含影像的历史元数据。模拟推理必须手动选择，不能用于临床。每次版本升级合并至 main 后，GitHub Actions 自动构建并创建附带静态网页 ZIP 的 Release。
+
+[Download Releases / 下载构建包](https://github.com/ZJY-HSBL/ScolioVision/releases)
+
+---
+
 ## English
 
 ### Overview
@@ -53,7 +63,7 @@ Structured Analysis Result
 ```bash
 git clone https://github.com/ZJY-HSBL/ScolioVision.git
 cd ScolioVision/web
-npm install
+npm ci
 npm run dev
 ```
 
@@ -67,6 +77,7 @@ Project verification:
 
 ```bash
 npm run check
+npm test
 ```
 
 ### Model Integration
