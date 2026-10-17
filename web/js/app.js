@@ -4,6 +4,7 @@ import trainingDetail from './trainingDetail.js';
 import analyzer from './analyzer.js';
 import history from './history.js';
 import measurement from './measurement.js';
+import workstationUI from './workstationUI.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   navigation.init();
@@ -12,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   analyzer.init();
   trainingDetail.init();
   history.init();
+  workstationUI.init();
   document.getElementById('go-to-measurement').addEventListener('click', () => {
     document.querySelector('[data-target="analyze-page"]').click();
   });
