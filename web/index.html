@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="ScolioVision 脊柱影像研究工作台：手动 Cobb 角测量、影像标注、记录导出及科研模型接口。">
-  <meta name="theme-color" content="#17252a">
+  <meta name="theme-color" content="#101d26">
   <title>ScolioVision · 脊柱影像研究工作台</title>
   <link rel="manifest" href="site.webmanifest">
   <link rel="icon" href="favicon.ico">
@@ -13,23 +13,23 @@
 <body>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="app-shell">
-  <nav class="app-nav" aria-label="主要导航">
+  <nav class="app-nav" aria-label="工作台导航">
     <div class="nav-brand">
       <div class="brand-logo" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
       <div><strong>ScolioVision</strong><small>SPINAL IMAGING LAB</small></div>
     </div>
-    <p class="nav-section-label">WORKSPACE</p>
-    <button class="nav-item active" data-target="home-page" type="button"><span class="nav-glyph" aria-hidden="true">⌂</span><span>项目概览</span></button>
-    <button class="nav-item" data-target="analyze-page" type="button"><span class="nav-glyph" aria-hidden="true">⌗</span><span>影像测量</span></button>
-    <div class="nav-footer"><span class="nav-status-dot"></span> RESEARCH ONLY <small>v0.4.0 · Local first</small></div>
+    <p class="nav-section-label">WORKSPACE / 工作区</p>
+    <button class="nav-item active" data-target="analyze-page" type="button" aria-current="page"><span class="nav-glyph" aria-hidden="true">⌗</span><span>影像测量</span></button>
+    <button class="nav-item" data-target="home-page" type="button"><span class="nav-glyph" aria-hidden="true">⌂</span><span>项目概览</span></button>
+    <div class="nav-footer"><span class="nav-status-dot"></span> RESEARCH PROTOTYPE <small>v0.5.0 · No patient archive</small></div>
   </nav>
   <div class="app-main">
     <header class="main-title">
-      <div><span class="header-kicker">IMAGING RESEARCH / SCIENTIFIC WORKFLOW</span><div class="brand-title">曲度智衡 <span>·</span> ScolioVision</div></div>
-      <span class="header-label">本地工作区 <b>●</b></span>
+      <div><span class="header-kicker">SCOLIOVISION / RESEARCH WORKSTATION</span><div class="brand-title">脊柱影像分析 <span>/</span> ScolioVision</div></div>
+      <span class="header-label" id="workspace-session-status">待导入影像 <b>●</b></span>
     </header>
     <main>
-      <section class="app-page active" id="home-page">
+      <section class="app-page" id="home-page">
         <div class="home-hero">
           <div><div class="section-index">01 / OVERVIEW</div><h1>从一张影像，<br>到一次可复核的测量。</h1><p>选择上下端椎终板，标注四个端点，复核 Cobb 角。每一步都有依据，不让模拟结果冒充临床结论。</p>
             <button class="hero-start" type="button" id="go-to-measurement">打开影像工作台 <span aria-hidden="true">↗</span></button></div>
@@ -39,24 +39,31 @@
         <section class="my-analysis"><div class="module-title"><span>最近测量记录</span><span class="module-caption" id="last-assessment">上次评估：暂无记录</span></div><p class="history-notice">记录元数据仅存于当前浏览器，不会默认存储上传的医学影像。请勿以此作为病历管理系统。</p><div class="empty-tip"><div class="empty-graphic">XR</div><p>尚无测量记录</p><p class="empty-subtitle">从影像工作台开始一次手动测量。</p></div><div class="analysis-list" style="display:none"></div></section>
       </section>
 
-      <section class="app-page" id="analyze-page">
-        <div class="workspace-heading"><div><div class="section-index">02 / MEASUREMENT STUDIO</div><h1 class="page-title">影像测量工作台</h1><p>请使用适宜的脊柱正位影像，并由具备相关知识的人员选择上、下端椎终板。</p></div><div class="page-version">COBB / 4-POINT METHOD</div></div>
+      <section class="app-page active" id="analyze-page">
+        <div class="workspace-heading"><div><div class="section-index">WORKSPACE / MEASUREMENT</div><h1 class="page-title">脊柱影像测量</h1><p>本地影像 · 手动四点终板标注 · 可复核 Cobb 角计算。研究原型，不提供诊断。</p></div><div class="page-version">MANUAL COBB / FOUR-POINT GEOMETRY</div></div>
+        <div class="workflow-track" aria-label="测量工作流程">
+          <div class="workflow-step" id="step-import" data-state="active"><span class="workflow-step-number">01</span><div><small>INPUT</small><strong>导入影像</strong></div></div>
+          <div class="workflow-step" id="step-landmark" data-state="pending"><span class="workflow-step-number">02</span><div><small>ANNOTATE</small><strong>终板标注</strong></div></div>
+          <div class="workflow-step" id="step-review" data-state="pending"><span class="workflow-step-number">03</span><div><small>REVIEW</small><strong>结果复核</strong></div></div>
+          <div class="workflow-step" id="step-export" data-state="pending"><span class="workflow-step-number">04</span><div><small>OUTPUT</small><strong>导出记录</strong></div></div>
+        </div>
         <div class="workspace-grid">
           <section class="workspace-canvas" aria-label="影像标注画布">
-            <div class="canvas-topbar"><div><span class="live-dot"></span> IMAGE VIEWER <small id="image-filename">未载入影像</small></div><span class="canvas-mark">LOCAL PREVIEW</span></div>
+            <div class="canvas-topbar"><div><span class="live-dot"></span> IMAGE VIEWER <small id="image-filename">未载入影像</small></div><span class="canvas-mark" id="viewer-state">NO IMAGE</span></div>
             <div class="canvas-tools">
+              <span class="viewer-tools-label">VIEW CONTROLS</span>
               <button type="button" class="tool-btn" id="zoom-out" title="缩小">−</button><span id="zoom-label">100%</span><button type="button" class="tool-btn" id="zoom-in" title="放大">+</button><span class="tool-separator"></span>
-              <button type="button" class="tool-btn tool-text" id="contrast-toggle">增强对比度</button><button type="button" class="tool-btn tool-text" id="reset-view">重置视图</button>
+              <button type="button" class="tool-btn tool-text" id="contrast-toggle" aria-pressed="false" title="调整显示对比度（不修改原始测量坐标）">增强对比度</button><button type="button" class="tool-btn tool-text" id="reset-view">重置视图</button>
             </div>
             <div class="image-viewport" id="image-viewport">
-              <div class="upload-area" id="upload-area"><label for="file-input"><div class="upload-symbol" aria-hidden="true">＋</div><strong>拖入脊柱影像，或点击选择文件</strong><span>支持 JPG、PNG、WEBP · 不超过 5 MB</span><small>仅在当前浏览器处理 · 远程模式除外</small></label><input id="file-input" type="file" accept="image/jpeg,image/png,image/webp"></div>
+              <div class="upload-area" id="upload-area"><label for="file-input"><div class="upload-symbol" aria-hidden="true">＋</div><strong>导入脊柱影像开始测量</strong><span>支持 JPG、PNG、WEBP · 不超过 5 MB</span><small>手动模式在浏览器内处理；远程模式会发送影像</small></label><input id="file-input" type="file" accept="image/jpeg,image/png,image/webp"></div>
               <div class="preview-area" id="preview-area"><div class="image-stage" id="image-stage"><img id="preview-img" alt="待标注脊柱影像"><svg xmlns="http://www.w3.org/2000/svg" id="measurement-overlay" aria-label="手动终板标注层" role="img"></svg></div></div>
             </div>
-            <div class="canvas-footer"><span>研究测量工具 · 非医疗器械</span><button type="button" class="change-image" id="preview-remove">更换影像 ↗</button></div>
+            <div class="canvas-footer"><span id="image-dimensions">NO IMAGE · LOCAL SESSION</span><span class="viewer-keyhint">快捷键 + / − 缩放 · 0 重置 · Ctrl/⌘ Z 撤回</span><button type="button" class="change-image" id="preview-remove">更换影像 ↗</button></div>
           </section>
 
           <aside class="workspace-panel" aria-label="测量操作面板">
-            <div class="panel-kicker">MEASUREMENT CONTROLS</div><h2>测量与分析</h2>
+            <div class="panel-kicker">INSPECTOR / MEASUREMENT</div><h2>测量控制台</h2>
             <label class="control-label" for="analysis-mode">工作模式</label>
             <select id="analysis-mode" class="mode-select"><option value="manual">手动 Cobb 角测量（默认）</option><option value="demo">演示推理 · 非真实测量</option><option value="remote">远程模型接口</option></select>
             <div id="manual-controls" class="manual-controls">
@@ -67,7 +74,7 @@
               <p class="edit-tip">标注四点后可拖动端点微调 · Ctrl/⌘ + Z 撤回</p>
               <button type="button" class="btn btn-secondary import-action" id="import-json">从 JSON 恢复标注</button>
               <input id="import-json-file" type="file" accept="application/json,.json" hidden>
-              <div class="instant-angle"><small>实时几何计算</small><strong id="live-cobb-angle">—</strong><span>仅反映所选两条终板的夹角</span></div>
+              <div class="instant-angle"><small>LIVE GEOMETRY / 实时计算</small><strong id="live-cobb-angle">—</strong><span>仅反映所选两条终板的夹角</span></div>
             </div>
             <div id="loading" class="loading" role="status">正在分析影像…</div><div id="error" class="error" role="alert"></div>
             <button type="button" class="btn btn-primary" id="analyze-btn" disabled>生成测量结果 <span aria-hidden="true">→</span></button>
@@ -79,7 +86,7 @@
               <button type="button" class="btn btn-secondary" id="save-result-btn">保存测量记录（不含影像）</button>
               <details class="exercise-disclosure"><summary>打开辅助动作资料库（非处方）</summary><section class="training-plan" id="training-plan"><div class="section-heading"><h3>动作演示</h3><span>研究交互参考</span></div><div id="training-plan-content"></div></section></details>
             </section>
-            <p class="panel-disclaimer">本工具仅用于科研和教学。手动标注结果依赖终板选择准确性，不提供临床诊断、治疗建议或自动椎体识别。</p>
+            <p class="panel-disclaimer">仅限科研教学。Cobb 角来自人工选定终板，软件不会自动识别椎体、完成临床分型或提供治疗建议。</p>
           </aside>
         </div>
       </section>
