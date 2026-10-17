@@ -5,8 +5,12 @@ const navigation = {
 
     navItems.forEach(item => {
       item.addEventListener('click', () => {
-        navItems.forEach(nav => nav.classList.remove('active'));
+        navItems.forEach(nav => {
+          nav.classList.remove('active');
+          nav.removeAttribute('aria-current');
+        });
         item.classList.add('active');
+        item.setAttribute('aria-current', 'page');
 
         const targetPageId = item.getAttribute('data-target');
 
