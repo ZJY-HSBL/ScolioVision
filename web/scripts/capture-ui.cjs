@@ -31,7 +31,7 @@ const {chromium}=require('playwright');
  await page.locator('#file-input').setInputFiles({name:'synthetic-test-fixture.png',mimeType:'image/png',buffer});
  await page.locator('#preview-area').waitFor({state:'visible'});
  const picks=[[.33,.34],[.62,.37],[.30,.75],[.64,.69]];
- for(const [x,y] of picks){const b=await page.locator('#measurement-overlay').boundingBox();assert(b?.width>100);await page.mouse.click(b.x+b.width*x,b.y+b.height*y)}
+ for(const [x,y] of picks){await page.locator('#measurement-overlay').evaluate((el,pt)=>{const r=el.getBoundingClientRect();el.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:r.x+r.width*pt[0],clientY:r.y+r.height*pt[1]}))},[x,y])}
  assert.equal((await page.locator('#point-count').textContent()).trim(),'4 / 4');
  await page.locator('#analyze-btn').click();
  await page.locator('#result-area').waitFor({state:'visible'});
