@@ -55,3 +55,7 @@ npm run dev
 ## Releases 发布约定
 
 `web/package.json` 的版本是唯一版本源。每次需要发布时先递增版本，再合并至 `main`。GitHub Actions「Publish release」在 main 更新后执行检查、测试、生产构建，自动创建 `vX.Y.Z` GitHub Release 并附加 `ScolioVision-web-vX.Y.Z.zip`。已存在该版本 Release 时不重复创建。也支持在 Actions 页面手动触发发布。Release ZIP 是静态 Web 构建，不是 Windows 安装包，也不包含医疗诊断模型。
+
+## v0.4.0 · 精细测量与界面展示
+
+支持四点标注后的拖动微调、Ctrl/⌘+Z 撤回及同尺寸影像下恢复 JSON 端点。详细桌面/移动端实际界面截图请参见 [README 主页面](README.md#prototype-ui--原型界面)。截图的测试图像为合成示例，不包含真实患者数据。程序不提供自动端椎选取或临床诊断。

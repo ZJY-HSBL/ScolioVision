@@ -25,7 +25,19 @@ const measurement = {
     this.count = document.getElementById('point-count');
     this.instruction = document.getElementById('point-instruction');
     this.live = document.getElementById('live-cobb-angle');
+
     this.svg.addEventListener('click', e => this.addPoint(e));
+    this.svg.addEventListener('pointerdown', event => this.beginDrag(event));
+    this.svg.addEventListener('pointermove', event => this.moveDrag(event));
+    this.svg.addEventListener('pointerup', event => this.endDrag(event));
+    this.svg.addEventListener('pointercancel', event => this.endDrag(event));
+    document.addEventListener('keydown', event => {
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.matches('input, textarea, select') || target.isContentEditable)) return;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z' && document.getElementById('analyze-page').classList.contains('active') && this.points.length) {
+        event.preventDefault(); this.undo();
+      }
+    });
     document.getElementById('undo-point').addEventListener('click', () => this.undo());
     document.getElementById('clear-points').addEventListener('click', () => this.clear());
     document.getElementById('zoom-in').addEventListener('click', () => this.setZoom(this.zoom + .25));
@@ -62,6 +74,50 @@ const measurement = {
     this.render();
     this.emitChange();
   },
+
+  imagePoint(event) {
+    const rect = this.svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    return {
+      x: Math.max(0, Math.min(this.width, (event.clientX - rect.left) * this.width / rect.width)),
+      y: Math.max(0, Math.min(this.height, (event.clientY - rect.top) * this.height / rect.height))
+    };
+  },
+  beginDrag(event) {
+    if (this.points.length !== 4 || document.getElementById('analysis-mode').value !== 'manual') return;
+    const pos = this.imagePoint(event);
+    if (!pos) return;
+    const radius = Math.max(16, this.width * 22 / Math.max(this.svg.getBoundingClientRect().width, 1));
+    let nearest = -1, distance = radius;
+    this.points.forEach((p, index) => {
+      const d = Math.hypot(p.x - pos.x, p.y - pos.y);
+      if (d < distance) { nearest = index; distance = d; }
+    });
+    if (nearest < 0) return;
+    this.dragIndex = nearest;
+    this.svg.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  },
+  moveDrag(event) {
+    if (this.dragIndex === undefined) return;
+    const point = this.imagePoint(event);
+    if (!point) return;
+    this.points[this.dragIndex] = point;
+    this.render();
+    this.emitChange();
+  },
+  endDrag(event) {
+    if (this.dragIndex === undefined) return;
+    this.dragIndex = undefined;
+    if (this.svg.hasPointerCapture(event.pointerId)) this.svg.releasePointerCapture(event.pointerId);
+  },
+  loadPoints(points) {
+    if (!this.width || !this.height || !Array.isArray(points) || points.length !== 4) throw new Error('请先导入影像与有效的四点标注');
+    if (!points.every(p => Number.isFinite(p.x) && Number.isFinite(p.y) && p.x >= 0 && p.x <= this.width && p.y >= 0 && p.y <= this.height)) throw new Error('导入的坐标超出了影像边界');
+    cobbAngleFromPoints(points);
+    this.points = points.map(p => ({x: p.x, y: p.y}));
+    this.render(); this.emitChange();
+  },
   undo() { if (!this.points.length) return; this.points.pop(); this.render(); this.emitChange(); },
   clear() { this.points = []; this.render(); this.emitChange(); },
   setZoom(level) {
@@ -87,6 +143,7 @@ const measurement = {
   render() {
     if (!this.svg) return;
     this.svg.replaceChildren();
+    this.svg.style.touchAction = this.points.length === 4 ? 'none' : 'manipulation';
     this.points.forEach((point, index) => {
       const hue = index < 2 ? '#f1b46d' : '#67d5bd';
       const ring = element('circle', {cx: point.x, cy: point.y, r: Math.max(5, this.width / 125), fill: hue, stroke: '#142b2b', 'stroke-width': Math.max(2, this.width / 450)});
