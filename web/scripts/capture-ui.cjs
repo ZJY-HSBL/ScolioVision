@@ -56,6 +56,14 @@ const {chromium}=require('playwright');
  await m.locator('[data-target="analyze-page"]').click();
  await m.locator('#file-input').setInputFiles({name:'synthetic-test-fixture.png',mimeType:'image/png',buffer});
  await m.locator('#preview-area').waitFor({state:'visible'});
+ await m.waitForFunction(() => {
+   const svg=document.getElementById('measurement-overlay'), img=document.getElementById('preview-img');
+   return svg.getAttribute('viewBox') && img.naturalWidth > 0 && svg.getBoundingClientRect().height>0;
+ },null,{timeout:10000});
+ console.log('MOBILE VIEW:',await m.evaluate(()=>{
+   const svg=document.getElementById('measurement-overlay'),r=svg.getBoundingClientRect();
+   return {viewBox:svg.getAttribute('viewBox'),rect:{x:r.x,y:r.y,width:r.width,height:r.height},mode:document.getElementById('analysis-mode').value,display:getComputedStyle(svg).display,pointer:getComputedStyle(svg).pointerEvents};
+ }));
  for(const xy of picks){await m.locator('#measurement-overlay').evaluate((el,pt)=>{const r=el.getBoundingClientRect();el.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:r.x+r.width*pt[0],clientY:r.y+r.height*pt[1]}))},xy)}
  assert.equal((await m.locator('#point-count').textContent()).trim(),'4 / 4');
  await m.locator('#analyze-btn').click();await m.locator('#result-area').waitFor({state:'visible'});
