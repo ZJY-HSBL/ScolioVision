@@ -1,7 +1,7 @@
 const APP_CONFIG = Object.freeze({
   projectName: 'ScolioVision Research Prototype',
-  version: '0.3.0',
-  analysisMode: 'demo',
+  version: '0.5.0',
+  analysisMode: 'manual',
   apiEndpoint: '',
   requestTimeoutMs: 15000,
   maxUploadBytes: 5 * 1024 * 1024,

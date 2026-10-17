@@ -1,6 +1,6 @@
 {
   "name": "scoliovision-research-prototype",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Image-first spinal radiograph research workstation with manual four-point Cobb angle measurement, optional demo and remote adapter.",
   "private": true,
   "keywords": [

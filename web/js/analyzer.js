@@ -144,6 +144,7 @@ const analyzer = {
       this.trainingPlanContent.append(item);
     });
     this.resultArea.style.display = 'block';
+    window.dispatchEvent(new Event('scoliovision:result-ready'));
   },
 
   async startAnalysis() {

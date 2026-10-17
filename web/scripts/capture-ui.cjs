@@ -6,6 +6,8 @@ const {chromium}=require('playwright');
  const desktop=await browser.newContext({viewport:{width:1440,height:940},deviceScaleFactor:1});
  const page=await desktop.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
+ await page.locator('#analyze-page.active').waitFor();
+ await page.locator('[data-target="home-page"]').click();
  await page.locator('#home-page.active').waitFor();
  await page.screenshot({path:path.join(dir,'overview-desktop.png'),fullPage:true,animations:'disabled'});
  await page.locator('[data-target="analyze-page"]').click();
