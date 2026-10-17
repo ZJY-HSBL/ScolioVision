@@ -47,7 +47,7 @@ const {chromium}=require('playwright');
  const saved=JSON.parse(fs.readFileSync(await dl.path(),'utf8'));assert.equal(saved.schema,'scoliovision.measurement.v1');
  await page.locator('#clear-points').click();
  await page.locator('#import-json-file').setInputFiles({name:'saved.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(saved))});
- assert.equal((await page.locator('#point-count').textContent()).trim(),'4 / 4');
+ await page.waitForFunction(() => document.getElementById('point-count').textContent.trim() === '4 / 4',{timeout:10000});
  assert.deepEqual(errors,[]);
  // Mobile: actual responsive layout with synthetic fixture and manually marked angle
  const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true});
