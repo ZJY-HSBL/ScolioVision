@@ -96,9 +96,9 @@ h1,h2,h3,h4,p { margin: 0; }
 #zoom-label { width: 42px; color: #ccdde1; text-align: center; font: 11px var(--mono); }
 .tool-separator { height: 20px; margin: 0 4px; border-left: 1px solid #3c515b; }
 .image-viewport { position: relative; display: flex; align-items: flex-start; justify-content: center; min-height: clamp(460px,60vh,760px); max-height: 76vh; overflow: auto; background-color: #0b151d; background-image: radial-gradient(#243741 0.8px,transparent 0.8px); background-size: 22px 22px; }
-.image-viewport::before, .image-viewport::after { position: sticky; top: 14px; height: 0; font: 9px var(--mono); color: #6a838c; pointer-events: none; }
-.image-viewport::before { content: "R / IMAGE PLANE"; left: 14px; margin-right: auto; }
-.image-viewport::after { content: "SCO / 01"; right: 14px; margin-left: auto; }
+.image-viewport::before, .image-viewport::after { position: absolute; z-index: 1; top: 14px; font: 9px var(--mono); color: #6a838c; pointer-events: none; }
+.image-viewport::before { content: "RESEARCH / IMAGE PLANE"; left: 14px; }
+.image-viewport::after { content: "SCO / 01"; right: 14px; }
 .upload-area { flex: none; width: min(650px,calc(100% - 56px)); min-height: 270px; margin: clamp(65px,10vh,110px) auto; border: 1px dashed #47636c; border-radius: 8px; background: rgba(24,42,51,.76); color: #eaf5f6; transition: border-color .15s, background .15s; }
 .upload-area:hover, .upload-area.dragover { border-color: #4ec8b8; background: #203d43; }
 .upload-area label { display: flex; min-height: 268px; padding: 22px; flex-direction: column; align-items: center; justify-content: center; gap: 11px; text-align: center; cursor: pointer; }
