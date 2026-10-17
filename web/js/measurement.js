@@ -37,6 +37,12 @@ const measurement = {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z' && document.getElementById('analyze-page').classList.contains('active') && this.points.length) {
         event.preventDefault(); this.undo();
       }
+      if (!event.ctrlKey && !event.metaKey && !event.altKey &&
+          document.getElementById('analyze-page').classList.contains('active')) {
+        if (event.key === '+' || event.key === '=') { event.preventDefault(); this.setZoom(this.zoom + .25); }
+        else if (event.key === '-') { event.preventDefault(); this.setZoom(this.zoom - .25); }
+        else if (event.key === '0') { event.preventDefault(); this.resetView(); }
+      }
     });
     document.getElementById('undo-point').addEventListener('click', () => this.undo());
     document.getElementById('clear-points').addEventListener('click', () => this.clear());
