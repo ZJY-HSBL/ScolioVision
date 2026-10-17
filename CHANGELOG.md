@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0 — 2026-10-17
+
+- Rebuilt visual language as a restrained imaging workstation with a single, maintainable CSS system.
+- Made the actual measurement viewer the default screen instead of marketing-style overview.
+- Added visible four-stage workflow progress, original image dimensions, honest mode/status labels and keyboard view controls.
+- Preserved manual four-point Cobb-angle calculation, results export, research-only wording and responsive layout.
+- Updated automated real-browser screenshot navigation for the new default page.
+
+
 ## 0.4.0 — 2026-10-17
 
 - Added drag-to-edit endpoints, keyboard undo and user-visible refinement instructions.
