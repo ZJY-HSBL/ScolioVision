@@ -7,11 +7,15 @@
 
 ---
 
-## Release v0.4.0 / 版本说明
+## Release v0.5.0 / 版本说明
 
 **Current default: user-selected four-point Cobb-angle geometry (no automatic detection).** Select the superior and inferior endplate endpoints in the image viewer. Undo, zoom, local JSON/PNG exports, and metadata-only local history are supported. Synthetic demo values are isolated behind an explicitly labelled mode; they are **not medical measurements**. The interface is a research prototype, not a medical device.
 
 **当前默认：人工四点终板标注 + 几何 Cobb 角计算；支持端点拖动微调与已导出 JSON 的恢复。** 可撤回标注、缩放影像、导出 JSON/PNG，并仅保存不含影像的历史元数据。模拟推理必须手动选择，不能用于临床。每次版本升级合并至 main 后，GitHub Actions 自动构建并创建附带静态网页 ZIP 的 Release。
+
+**v0.5.0 workstation redesign:** The app now opens in the measurement viewer. A consistent radiology-inspired shell, dark image viewport, four-stage workflow rail, file/resolution status, accessible controls, and shortcut zoom (+ / − / 0) keep attention on image annotation. Appearance is not evidence of medical validation.
+
+**v0.5.0 医学影像工作台视觉重构：** 默认进入影像测量；新增四阶段流程状态、暗色影像查看器、原图尺寸信息、快捷键缩放、统一的控制台与移动端布局。保持人工四点计算逻辑与研究用途边界，不借界面外观暗示临床认证。
 
 [Download Releases / 下载构建包](https://github.com/ZJY-HSBL/ScolioVision/releases)
 
@@ -42,6 +46,8 @@ The system adopts a modular architecture so that image processing, inference ser
 
 ### Key Features
 
+- Professional workstation layout with image-first launch, structured workflow status, resolution indicator, keyboard zoom (+, -, 0), and a compact measurement inspector.
+- No patient identity/clinical status is invented by the UI; remote processing and synthetic inference retain explicit labels.
 - Editable landmark handles, keyboard undo, schema-validated measurement JSON import and matching-image checks.
 - Desktop and mobile screenshots taken from the real app, using synthetic test fixtures.
 
