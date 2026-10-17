@@ -1,7 +1,8 @@
 name: Capture real UI screenshots
 on:
   push:
-    branches: [feat/v0.4-interactive-measurement-and-ui-captures]
+    branches: ['feat/**']
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -47,5 +48,5 @@ jobs:
             echo "No changed screenshots"
           else
             git commit -m "docs: capture actual workstation screenshots [skip shots]"
-            git push origin "HEAD:$"+"{GITHUB_REF_NAME}"
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi
