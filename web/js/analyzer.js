@@ -1,4 +1,5 @@
 import config from './config.js';
+import {parseMeasurementImport} from './measurementIO.mjs';
 import utils from './utils.js';
 import imageUpload from './imageUpload.js';
 import measurement from './measurement.js';
@@ -26,7 +27,10 @@ const analyzer = {
     this.analyzeBtn.addEventListener('click', () => this.startAnalysis());
     this.saveResultBtn.addEventListener('click', () => this.saveResult());
     this.modeSelect.addEventListener('change', () => this.changeMode());
+
     document.getElementById('export-json').addEventListener('click', () => this.exportJson());
+    document.getElementById('import-json').addEventListener('click', () => document.getElementById('import-json-file').click());
+    document.getElementById('import-json-file').addEventListener('change', event => this.importJson(event));
     document.getElementById('export-image').addEventListener('click', () => {
       try { measurement.exportAnnotatedPng(); } catch (error) { utils.showToast(error.message || '标注导出失败'); }
     });
@@ -191,6 +195,23 @@ const analyzer = {
     } catch(error) {
       utils.showToast('本地存储失败，请检查空间或浏览器设置');
       console.error(error);
+    }
+  },
+
+
+  async importJson(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    try {
+      if (file.size > 2_000_000 || !file.name.toLowerCase().endsWith('.json')) throw new Error('请选择不超过 2MB 的 JSON 文件');
+      if (this.modeSelect.value !== 'manual') throw new Error('请切换到手动测量模式');
+      const text = await file.text();
+      const points = parseMeasurementImport(text,{width:measurement.width,height:measurement.height});
+      measurement.loadPoints(points);
+      utils.showToast('已恢复四个端点，请核对标注后重新生成结果');
+    } catch(error) {
+      utils.showToast(error.message || '导入失败');
     }
   },
 

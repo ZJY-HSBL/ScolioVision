@@ -21,7 +21,7 @@
     <p class="nav-section-label">WORKSPACE</p>
     <button class="nav-item active" data-target="home-page" type="button"><span class="nav-glyph" aria-hidden="true">⌂</span><span>项目概览</span></button>
     <button class="nav-item" data-target="analyze-page" type="button"><span class="nav-glyph" aria-hidden="true">⌗</span><span>影像测量</span></button>
-    <div class="nav-footer"><span class="nav-status-dot"></span> RESEARCH ONLY <small>v0.3.0 · Local first</small></div>
+    <div class="nav-footer"><span class="nav-status-dot"></span> RESEARCH ONLY <small>v0.4.0 · Local first</small></div>
   </nav>
   <div class="app-main">
     <header class="main-title">
@@ -64,6 +64,9 @@
               <div class="point-progress" id="point-progress"><span></span><span></span><span></span><span></span></div>
               <p class="point-instruction" id="point-instruction">① 点击上端椎上终板的左端点</p>
               <div class="point-actions"><button type="button" id="undo-point">撤回上一点</button><button type="button" id="clear-points">清空标注</button></div>
+              <p class="edit-tip">标注四点后可拖动端点微调 · Ctrl/⌘ + Z 撤回</p>
+              <button type="button" class="btn btn-secondary import-action" id="import-json">从 JSON 恢复标注</button>
+              <input id="import-json-file" type="file" accept="application/json,.json" hidden>
               <div class="instant-angle"><small>实时几何计算</small><strong id="live-cobb-angle">—</strong><span>仅反映所选两条终板的夹角</span></div>
             </div>
             <div id="loading" class="loading" role="status">正在分析影像…</div><div id="error" class="error" role="alert"></div>

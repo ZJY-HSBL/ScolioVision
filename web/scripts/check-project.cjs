@@ -17,6 +17,8 @@ const required = [
   'js/utils.js',
   'js/measurement.js',
   'js/cobbMath.mjs',
+  'js/measurementIO.mjs',
+  'tests/measurementIO.test.mjs',
   'tests/cobbMath.test.mjs',
   'webpack.common.js',
   'webpack.config.dev.js',

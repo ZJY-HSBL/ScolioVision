@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-10-17
+
+- Added drag-to-edit endpoints, keyboard undo and user-visible refinement instructions.
+- Added schema-validated JSON import for manually marked endplates; image dimensions and coordinates are checked before applying.
+- Added automated desktop/mobile UI screenshot capture and README preview gallery, using a synthetic test fixture.
+- Expanded automated test coverage for measurement import and malformed input.
+- Kept strict separation between manual geometry, demo inference and unvalidated remote model output.
+
 ## 0.3.0 — 2026-10-17
 
 ### Added

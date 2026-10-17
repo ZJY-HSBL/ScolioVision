@@ -48,3 +48,7 @@ The default mode is now **manual endplate-based Cobb geometry**: place four imag
 Run `npm test` for geometry unit tests. On version increments merged into `main`, the GitHub Actions release workflow builds, tests and publishes a versioned static site ZIP in [Releases](https://github.com/ZJY-HSBL/ScolioVision/releases). This package is not a native desktop installer.
 
 This is a research and teaching tool, not a medical device. End-vertebra selection and clinical interpretation require qualified oversight.
+
+## v0.4.0 precision workflow and screenshots
+
+Drag landmark handles after placing all four points, undo with Ctrl/Cmd+Z, and import previously exported measurement JSON if the active image's dimensions match. See [README prototype screenshots](README.md#prototype-ui--原型界面). Screenshots use a synthetic non-patient fixture.

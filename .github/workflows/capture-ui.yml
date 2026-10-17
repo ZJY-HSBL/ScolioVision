@@ -1,0 +1,52 @@
+name: Capture real UI screenshots
+on:
+  push:
+    branches: ['feat/**']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  browser-capture:
+    if: "!contains(github.event.head_commit.message, '[skip shots]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build and test
+        working-directory: web
+        run: |
+          npm ci
+          npm run check
+          npm test
+          npm run build
+      - name: Install Chromium and Playwright
+        working-directory: web
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Browser smoke test and screenshots
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory web/dist >/tmp/scoliovision-http.log 2>&1 &
+          PID=$!
+          trap 'kill "$PID" || true' EXIT
+          sleep 2
+          node web/scripts/capture-ui.cjs
+      - name: Commit real screenshots
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots/*.png
+          if git diff --cached --quiet; then
+            echo "No changed screenshots"
+          else
+            git commit -m "docs: capture actual workstation screenshots [skip shots]"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
